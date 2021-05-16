@@ -205,52 +205,55 @@ localparam CONF_STR = {
 	"-;",
 	"O12,Iterations,15/511,31/1023,63/2047,127/255;",
 	"O3,Iterations,left value,right value;",
-	"O56,Colour scheme, Pretty, Per Core, Flat;", 
-	"O78,Flat Colour,White,Red,Green,Blue;",
+	"O45,Colour scheme, Pretty, Per Core, Flat;", 
+	"O67,Flat Colour,White,Red,Green,Blue;",
+	"O8,X Navigation, Normal AD, Inverted DA;",
+	"O9,Y Navigation, Normal WD, Inverted DW;",
+	"OA,Z Navigation, Normal ZX, Inverted XZ;",
 	"P1,Cores 0-3;",
 	"P1-;",
 	"P1-, -= Cores 0-3 =-;",
 	"P1-;",
-   "P1O9,Core0,Running,Paused;",
-   "P1OA,Core1,Running,Paused;",
-   "P1OB,Core2,Running,Paused;",
-   "P1OC,Core3,Running,Paused;",
+   "P1OC,Core0,Running,Paused;",
+   "P1OD,Core1,Running,Paused;",
+   "P1OE,Core2,Running,Paused;",
+   "P1OF,Core3,Running,Paused;",
 	"P1-;",
 	"P2,Cores 4-7;",
 	"P2-;",
 	"P2-, -= Cores 4-7 =-;",
 	"P2-;",
-   "P2OD,Core4,Running,Paused;",
-   "P2OE,Core5,Running,Paused;",
-   "P2OF,Core6,Running,Paused;",
-   "P2OG,Core7,Running,Paused;",
+   "P2OG,Core4,Running,Paused;",
+   "P2OH,Core5,Running,Paused;",
+   "P2OI,Core6,Running,Paused;",
+   "P2OJ,Core7,Running,Paused;",
 	"P2-;",
 	"P3,Cores 8-11;",
 	"P3-;",
 	"P3-, -= Cores 8-11 =-;",
 	"P3-;",
-   "P3OH,Core8,Running,Paused;",
-   "P3OI,Core9,Running,Paused;",
-   "P3OJ,Core10,Running,Paused;",
-   "P3OK,Core11,Running,Paused;",
+   "P3OK,Core8,Running,Paused;",
+   "P3OL,Core9,Running,Paused;",
+   "P3OM,Core10,Running,Paused;",
+   "P3ON,Core11,Running,Paused;",
 	"P3-;",
 	"P4,Core 12-15;",
 	"P4-;",
 	"P4-, -= Cores 12-15 =-;",
 	"P4-;",
-	"P4OL,Core12,Running,Paused;",
-	"P4OM,Core13,Running,Paused;",
-	"P4ON,Core14,Running,Paused;",
-	"P4OO,Core15,Running,Paused;",
+	"P4OO,Core12,Running,Paused;",
+	"P4OP,Core13,Running,Paused;",
+	"P4OQ,Core14,Running,Paused;",
+	"P4OR,Core15,Running,Paused;",
 	"P5-;",
 	"P5,Cores 16-19;",
 	"P5-;",
 	"P5-, -= Cores 16-19 =-;",
 	"P5-;",
-	"P5OP,Core16,Running,Paused;",
-	"P5OQ,Core17,Running,Paused;",
-	"P5OR,Core18,Running,Paused;",
-	"P5OS,Core19,Running,Paused;",
+	"P5OS,Core16,Running,Paused;",
+	"P5OT,Core17,Running,Paused;",
+	"P5OU,Core18,Running,Paused;",
+	"P5OV,Core19,Running,Paused;",
 	"-;",
 	"T0,Reset;",
 	"R0,Reset and close OSD;",
@@ -323,23 +326,23 @@ mandelbrot mandelbrot
 );
 
 wire [lastcore:0] cores;
-assign cores[lastcore:0] 		= ~status[lastcore+9:9];
+assign cores[lastcore:0] 		= ~status[lastcore+12:12];
 
 wire [2:0] iterationspicker	= status[3:1];
 
-wire [1:0] col 					= status[8:7];
+wire [1:0] col 					= status[7:6];
 wire [7:0] Red 					= (!col || col == 1) ? 8'd255 : 8'd0;
 wire [7:0] Green 					= (!col || col == 2) ? 8'd255 : 8'd0;
 wire [7:0] Blue 					= (!col || col == 3) ? 8'd255 : 8'd0;
 
-wire useprettycolours 			= ~status[5] & ~status[6];
-wire percorecolours 				= status[5] & ~status[6];
+wire useprettycolours 			= ~status[4] & ~status[5];
+wire percorecolours 				= status[4] & ~status[5];
 
-assign navigate[0] 				= (ps2_key[9:0] == {2'b10, 8'h1C}); // a=left;
-assign navigate[1] 				= (ps2_key[9:0] == {2'b10, 8'h23}); // d=right;
-assign navigate[2] 				= (ps2_key[9:0] == {2'b10, 8'h1D}); // w=top;
-assign navigate[3] 				= (ps2_key[9:0] == {2'b10, 8'h1B}); // d=bottom;
-assign navigate[4] 				= (ps2_key[9:0] == {2'b10, 8'h1A}); // z=zoomin
-assign navigate[5] 				= (ps2_key[9:0] == {2'b10, 8'h22}); // x=zoomout
+assign navigate[0] 				= status[8] ? (ps2_key[9:0] == {2'b10, 8'h23}) : (ps2_key[9:0] == {2'b10, 8'h1C}); // a=left; d = right if status[8] == 0, a = right, d = left if status[8] == 1
+assign navigate[1] 				= status[8] ? (ps2_key[9:0] == {2'b10, 8'h1C}) : (ps2_key[9:0] == {2'b10, 8'h23});
+assign navigate[2] 				= status[9] ? (ps2_key[9:0] == {2'b10, 8'h1B}) : (ps2_key[9:0] == {2'b10, 8'h1D}); // w=top, d = bottom if status[9] ==0, w = bottom, d = top if status[9] == 1
+assign navigate[3] 				= status[9] ? (ps2_key[9:0] == {2'b10, 8'h1D}) : (ps2_key[9:0] == {2'b10, 8'h1B});
+assign navigate[4] 				= status[10] ? (ps2_key[9:0] == {2'b10, 8'h22}) : (ps2_key[9:0] == {2'b10, 8'h1A}); // z=zoomin, x = zoomout if status[10] ==  0, z = zoomout, x = zoomin if status[10] == 1
+assign navigate[5] 				= status[10] ? (ps2_key[9:0] == {2'b10, 8'h1A}) : (ps2_key[9:0] == {2'b10, 8'h22});
 
 endmodule
